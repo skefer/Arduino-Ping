@@ -5,7 +5,7 @@
  result over the serial port. 
 
  Circuit:
- * Ethernet shield attached to pins 10, 11, 12, 13
+ *w5500 connect to Mega2560 50,51,52,53
  
  created 30 Sep 2010
  by Blake Foster
@@ -17,24 +17,30 @@
 #include <ICMPPing.h>
 
 byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED}; // max address for ethernet shield
-byte ip[] = {192,168,2,177}; // ip address for ethernet shield
-IPAddress pingAddr(74,125,26,147); // ip address to ping
+byte ip[] = {192,168,0,177}; // ip address for ethernet shield
+IPAddress pingAddr(192,168,0,19); // ip address to ping
 
-SOCKET pingSocket = 0;
 
 char buffer [256];
-ICMPPing ping(pingSocket, (uint16_t)random(0, 255));
+ICMPPing ping;
 
 void setup() 
 {
+  pinMode(53, OUTPUT);
+  SPI.begin();
+  digitalWrite(53, LOW); // enable Ethernet
   // start Ethernet
   Ethernet.begin(mac, ip);
   Serial.begin(9600);
+   Serial.println(Ethernet.localIP());
+  Serial.println("Init ok");
 }
 
 void loop()
 {
-  ICMPEchoReply echoReply = ping(pingAddr, 4);
+  Serial.println("Begin Ping...");
+  ICMPEchoReply echoReply = ping.Ping(pingAddr);
+  Serial.println("GotData");
   if (echoReply.status == SUCCESS)
   {
     sprintf(buffer,

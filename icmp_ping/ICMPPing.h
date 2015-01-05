@@ -10,21 +10,21 @@
 #include <SPI.h>
 #include <Ethernet.h>
 #include <utility/w5100.h>
+#include <utility/socket.h>
 
 #define REQ_DATASIZE 64
 #define ICMP_ECHOREPLY 0
 #define ICMP_ECHOREQ 8
 #define ICMP_ECHOREP 0
 #define TIME_EXCEEDED 11
-#define PING_TIMEOUT 1000
+#define PING_TIMEOUT 100
 
 typedef unsigned long time_t;
 
 class ICMPHeader;
 class ICMPPing;
 
-typedef enum Status
-{
+typedef enum Status {
     /*
     Indicates whether a ping succeeded or failed due to one of various error
     conditions. These correspond to error conditions that occur in this
@@ -37,8 +37,7 @@ typedef enum Status
 };
 
 
-struct ICMPHeader
-{
+struct ICMPHeader {
     /*
     Header for an ICMP packet. Does not include the IP header.
     */
@@ -48,8 +47,7 @@ struct ICMPHeader
 };
 
 
-struct ICMPEcho
-{
+struct ICMPEcho {
     /*
     Contents of an ICMP echo packet, including the ICMP header. Does not
     include the IP header.
@@ -91,8 +89,7 @@ struct ICMPEcho
 };
 
 
-struct ICMPEchoReply
-{
+struct ICMPEchoReply {
     /*
     Struct returned by ICMPPing().
     @param data: The packet data, including the ICMP header.
@@ -109,8 +106,7 @@ struct ICMPEchoReply
 };
 
 
-class ICMPPing
-{
+class ICMPPing {
     /*
     Function-object for sending ICMP ping requests.
     */
@@ -123,6 +119,10 @@ public:
     arbitrary number.
     */
     ICMPPing(SOCKET s, uint8_t id);
+
+    ICMPPing();
+
+    ICMPEchoReply Ping(const IPAddress&);
 
     /*
     Pings the given IP address.
